@@ -1,7 +1,9 @@
 package com.hn.sprase.presentation.screen.home
 
+import android.service.quicksettings.Tile
 import androidx.compose.animation.VectorConverter
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -17,12 +19,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Add
@@ -32,6 +38,7 @@ import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -40,6 +47,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -51,16 +59,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import com.hn.sprase.R
 import java.text.NumberFormat
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen(){
@@ -72,111 +85,139 @@ fun HomeScreen(){
         mutableStateOf(false)
     }
 
-    Column(
+    LazyColumn(
         modifier = Modifier.fillMaxSize()
             .statusBarsPadding()
             .padding(20.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
-                    model = "https://cellphones.com.vn/sforum/wp-content/uploads/2024/01/avartar-anime-6.jpg",
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop, // Cắt ảnh cho vừa khung
-                    modifier = Modifier
-                        .size(45.dp)                // set kích thước
-                        .clip(CircleShape)
-                )
-                Spacer(Modifier.width(10.dp))
-                Column {
-                    Text("Good morning,", fontSize = 14.sp, fontWeight = FontWeight.Normal )
-                    Text(name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
-            }
-            IconButton(onClick = {}, modifier = Modifier.size(60.dp)) {
-                BadgedBox(
-                    badge = {
-                        Badge {
-                            Text("5")
-                        }
-                    }
-                ) {
-                    Icon(
-                        Icons.Default.Notifications,
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    AsyncImage(
+                        model = "https://cellphones.com.vn/sforum/wp-content/uploads/2024/01/avartar-anime-6.jpg",
                         contentDescription = null,
-                        tint = Color(0xFF407AFF),
-                        modifier = Modifier.size(30.dp),
+                        contentScale = ContentScale.Crop, // Cắt ảnh cho vừa khung
+                        modifier = Modifier
+                            .size(45.dp)                // set kích thước
+                            .clip(CircleShape)
                     )
+                    Spacer(Modifier.width(10.dp))
+                    Column {
+                        Text("Good morning,", fontSize = 14.sp, fontWeight = FontWeight.Normal)
+                        Text(name, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+                }
+                IconButton(onClick = {}, modifier = Modifier.size(60.dp)) {
+                    BadgedBox(
+                        badge = {
+                            Badge {
+                                Text("5")
+                            }
+                        }
+                    ) {
+                        Icon(
+                            Icons.Default.Notifications,
+                            contentDescription = null,
+                            tint = Color(0xFF407AFF),
+                            modifier = Modifier.size(30.dp),
+                        )
+                    }
                 }
             }
         }
 
-        Spacer(Modifier.height(20.dp))
+        item {
+            Spacer(Modifier.height(20.dp))
 
-        Card(
-            modifier = Modifier,
-            shape = RoundedCornerShape(22.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-            elevation = CardDefaults.cardElevation(0.dp)
-        ) {
-            Box(
-                Modifier.fillMaxWidth()
-                    .height(130.dp)
-                    .clip((RoundedCornerShape(22.dp)))
+            Card(
+                modifier = Modifier,
+                shape = RoundedCornerShape(22.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                elevation = CardDefaults.cardElevation(0.dp)
             ) {
-                Image(
-                    painter = painterResource(R.drawable.homebg),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.matchParentSize()
-                )
-
                 Box(
-                    Modifier.matchParentSize()
-                        .background(
-                            Brush.verticalGradient(
-                                0f to Color.Black.copy(alpha = 0.1f),
-                                1f to Color.Black.copy(alpha = 0.25f)
-                            )
-                        )
-                )
-
-                Column(
-                    modifier = Modifier.fillMaxSize()
-                        .padding(horizontal = 20.dp, vertical = 16.dp),
-                    verticalArrangement = Arrangement.SpaceBetween
+                    Modifier.fillMaxWidth()
+                        .height(130.dp)
+                        .clip((RoundedCornerShape(22.dp)))
                 ) {
-                    Text("spare balance", color = Color.White.copy(alpha = 0.9f), style = MaterialTheme.typography.labelLarge)
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            if(visibleMoney) "*******" else currency(545258.723),
-                            color = Color.White,
-                            style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold)
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        IconButton(onClick = {visibleMoney = !visibleMoney}, modifier = Modifier.size(30.dp)) {
-                            Icon(
-                                if(visibleMoney) Icons.Outlined.Favorite else Icons.Outlined.Lock,
-                                contentDescription = null,
-                                tint = Color.White
+                    Image(
+                        painter = painterResource(R.drawable.homebg),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.matchParentSize()
+                    )
+
+                    Box(
+                        Modifier.matchParentSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    0f to Color.Black.copy(alpha = 0.1f),
+                                    1f to Color.Black.copy(alpha = 0.25f)
+                                )
                             )
-                        }
-                    }
-                    Row(
-                        Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
+                    )
+
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                            .padding(horizontal = 20.dp, vertical = 16.dp),
+                        verticalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Surface(shape = RoundedCornerShape(50), color = Color.White, shadowElevation = 3.dp) {
-                            Row(Modifier.padding(horizontal = 12.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Box(Modifier.size(6.dp).background(Color(0xFF407AFF) ,CircleShape))
-                                Spacer(Modifier.width(4.dp))
-                                Box(Modifier.size(6.dp).background(Color(0xFF407AFF), CircleShape))
-                                Spacer(Modifier.width(8.dp))
-                                Text("4552", color = Color(0xFF407AFF), style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium))
+                        Text(
+                            "spare balance",
+                            color = Color.White.copy(alpha = 0.9f),
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                if (visibleMoney) "*******" else currency(545258.723),
+                                color = Color.White,
+                                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.SemiBold)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            IconButton(
+                                onClick = { visibleMoney = !visibleMoney },
+                                modifier = Modifier.size(30.dp)
+                            ) {
+                                Icon(
+                                    if (visibleMoney) Icons.Outlined.Favorite else Icons.Outlined.Lock,
+                                    contentDescription = null,
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            Surface(
+                                shape = RoundedCornerShape(50),
+                                color = Color.White,
+                                shadowElevation = 3.dp
+                            ) {
+                                Row(
+                                    Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        Modifier.size(6.dp)
+                                            .background(Color(0xFF407AFF), CircleShape)
+                                    )
+                                    Spacer(Modifier.width(4.dp))
+                                    Box(
+                                        Modifier.size(6.dp)
+                                            .background(Color(0xFF407AFF), CircleShape)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        "4552",
+                                        color = Color(0xFF407AFF),
+                                        style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Medium)
+                                    )
+                                }
                             }
                         }
                     }
@@ -184,18 +225,79 @@ fun HomeScreen(){
             }
         }
 
-        Spacer(Modifier.height(20.dp))
+        item {
 
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            PillActionButton(text = "Add money", icon = Icons.Outlined.Add, onClick = {})
-            PillActionButton(text = "Withdraw",  icon = Icons.Outlined.ArrowDropDown, onClick = {})
-            PillActionButton(text = "More...",   icon = Icons.Outlined.Menu, onClick = {})
+            Spacer(Modifier.height(20.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PillActionButton(text = "Add money", icon = Icons.Outlined.Add, onClick = {})
+                PillActionButton(
+                    text = "Withdraw",
+                    icon = Icons.Outlined.ArrowDropDown,
+                    onClick = {})
+                PillActionButton(text = "More...", icon = Icons.Outlined.Menu, onClick = {})
+            }
+
+            Spacer(Modifier.height(20.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text("My Analysis", style = MaterialTheme.typography.headlineSmall, color = Color(0xFF0F172A))
+                WeekPill()
+            }
         }
+
+        item {
+            ChartCard(
+                bars = listOf(36f, 34f, 52f, 63f, 28f, 40f, 22f),
+                labels = listOf("Apr 30","May 01","May 02","May 03","May 04","May 05","May 06"),
+                highlightIndex = 2,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .height(220.dp)
+            )
+        }
+
+        item {
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "May, 2025",
+                modifier = Modifier.padding(horizontal = 16.dp, 8.dp),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = Color(0xFF0F172A)
+            )
+        }
+
+        items(listOf(
+            Tx("Sent to Wilfred Alfred", "06 May 2022", -50.60),
+            Tx("Groceries - Walmart",   "05 May 2022", -32.45),
+            Tx("Deposit into spare",    "05 May 2022", 150.00),
+            Tx("Uber Ride",             "04 May 2022", -7.25),
+            Tx("App Store Refund",      "04 May 2022",  3.99),
+            Tx("Salary",                "03 May 2022", 2350.00),
+            Tx("Coffee Shop",           "03 May 2022", -4.80),
+            Tx("Electricity Bill",      "02 May 2022", -45.10),
+            Tx("Restaurant - Bento",    "01 May 2022", -12.30),
+            Tx("ATM Withdrawal",        "30 Apr 2022", -120.00)
+        )) { tx ->
+            TransactionRow(
+                tx = tx,
+                modifier = Modifier
+                    .padding(horizontal = 16.dp, vertical = 6.dp)
+                    .fillMaxWidth()
+            )
+        }
+
 
     }
 }
@@ -237,4 +339,174 @@ fun PillActionButton(
         Text(text, color = textColor, fontWeight = FontWeight.Medium, fontSize = 10.sp)
 
     }
+}
+
+@Composable
+private fun WeekPill(){
+    Surface(
+        onClick = {},
+        shape = RoundedCornerShape(50),
+        color = Color(0xFFE9EFFF),
+        contentColor = Color(0xFF407AFF),
+        shadowElevation = 0.dp,
+        tonalElevation = 0.dp,
+    ){
+        Row (
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text("Week", style = MaterialTheme.typography.labelLarge, color = Color(0xFF407AFF))
+            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
+        }
+    }
+}
+
+@Composable
+private fun ChartCard(
+    bars: List<Float>,
+    labels: List<String>,
+    highlightIndex: Int?,
+    modifier: Modifier = Modifier,
+    barWidth: Dp = 16.dp
+){
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(18.dp),
+        color = Color.White,
+        tonalElevation = 0.dp,
+        shadowElevation = 2.dp
+    ) {
+        Column(Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp, bottom = 12.dp)) {
+            Box(Modifier.fillMaxWidth().height(150.dp)){
+                BarsChart(
+                    values = bars,
+                    highlightIndex = highlightIndex,
+                    barWidth = barWidth
+                )
+            }
+
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                labels.forEachIndexed { i, lbl ->
+                    Text(
+                        lbl,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (i == highlightIndex) Color(0xFF63F0CB).copy(alpha = 0.9f) else Color(0xFF64748B)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun BarsChart(
+    values: List<Float>,
+    highlightIndex: Int?,
+    modifier: Modifier = Modifier,
+    barWidth: Dp = 16.dp,
+    girdLines: Int = 4
+){
+    val max = (values.maxOrNull() ?: 0f).coerceAtLeast(1f)
+    val dash = PathEffect.dashPathEffect(floatArrayOf(10f, 14f), 0f)
+
+    Canvas(modifier = modifier.fillMaxSize()) {
+        val w = size.width
+        val h = size.height
+        val bw = barWidth.toPx()
+        val gap = (w - (values.size * bw)) / (values.size + 1)
+
+        repeat(girdLines) { i ->
+            val y = h * (1f - (i + 1) / (girdLines + 1f))
+            drawLine(
+                color = Color(0xFFE6EEFF),
+                start = androidx.compose.ui.geometry.Offset(0f, y),
+                end = androidx.compose.ui.geometry.Offset(w, y),
+                strokeWidth = 2f,
+                pathEffect = dash
+            )
+        }
+
+        values.forEachIndexed { index, v ->
+            val left = gap * (index + 1) + bw + index
+            val barHeight = (v / max) * (h * 0.9f)
+            val top = h - barHeight
+            val color = if(index == highlightIndex) Color(0xFF63F0CB) else Color(0xFF407AFF)
+            drawRoundRect(
+                color = color,
+                topLeft = androidx.compose.ui.geometry.Offset(left, top),
+                size = androidx.compose.ui.geometry.Size(bw, barHeight),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(bw / 2f, bw / 2f)
+            )
+        }
+    }
+}
+
+data class Tx(
+    val  tile: String,
+    val  date: String,
+    val amount: Double
+)
+
+@Composable
+private fun TransactionRow(tx : Tx, modifier: Modifier = Modifier){
+    val amountColor = if(tx.amount >= 0) Color(0xFF10B981) else Color(0xFFEF4444)
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = Color.White,
+        tonalElevation = 0.dp,
+        shadowElevation = 1.dp,
+        onClick = {}
+    ) {
+        Row(
+            Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val dotColor = if(tx.amount >= 0) Color(0xFF63F0CB) else Color(0xFF407AFF)
+            Box(
+                Modifier.size(28.dp)
+                    .clip(CircleShape)
+                    .background(dotColor.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ){
+                Box(Modifier.size(10.dp).clip(CircleShape).background(dotColor))
+            }
+
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(
+                    tx.tile,
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    color = Color(0xFF0F172A)
+                )
+                Text(
+                    tx.date,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = Color(0xFF94A3B8)
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    text = (if (tx.amount >= 0) "+" else "") + formatMoney(tx.amount),
+                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                    color = amountColor
+                )
+                Spacer(Modifier.width(6.dp))
+                Icon(Icons.Default.KeyboardArrowRight, contentDescription = null, tint = Color(0xFFCBD5E1))
+            }
+        }
+    }
+
+}
+
+private fun formatMoney(v : Double) : String {
+    val sign = if( v < 0) "-" else ""
+    val abs = kotlin.math.abs(v)
+    val cents = ((abs - abs.toInt()) +100).roundToInt()
+    val whole = abs.toInt()
+    val withComma = "%,d".format(whole)
+    return "$sign$$withComma.${cents.toString().padStart(2, '0')}"
 }
