@@ -22,8 +22,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowDropDown
@@ -62,8 +60,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.hn.sprase.R
-import com.hn.sprase.presentation.screen.home.components.RangePill
-import com.hn.sprase.presentation.screen.home.components.TimeRange
+import com.hn.sprase.domain.model.TimeRange
+import com.hn.sprase.presentation.ui.components.RangePill
 import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -80,13 +78,37 @@ fun HomeScreen(){
 
     var range by remember { mutableStateOf(TimeRange.Week) }
 
+    val transactions = remember {
+        listOf(
+            Tx("Sent to Wilfred Alfred", "06 May 2022", -50.60),
+            Tx("Groceries - Walmart",   "05 May 2022", -32.45),
+            Tx("Deposit into spare",    "05 May 2022", 150.00),
+            Tx("Uber Ride",             "04 May 2022", -7.25),
+            Tx("App Store Refund",      "04 May 2022",  3.99),
+            Tx("Salary",                "03 May 2022", 2350.00),
+            Tx("Coffee Shop",           "03 May 2022", -4.80),
+            Tx("Electricity Bill",      "02 May 2022", -45.10),
+            Tx("Restaurant - Bento",    "01 May 2022", -12.30),
+            Tx("ATM Withdrawal",        "30 Apr 2022", -120.00)
+        )
+    }
+
+    val chartBars = remember { listOf(36f, 34f, 52f, 63f, 28f, 40f, 22f) }
+    val chartLabels = remember { listOf("Apr 30","May 01","May 02","May 03","May 04","May 05","May 06") }
+
+    val balanceGradient = remember {
+        Brush.verticalGradient(
+            0f to Color.Black.copy(alpha = 0.1f),
+            1f to Color.Black.copy(alpha = 0.25f)
+        )
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
             .statusBarsPadding()
-            .padding(20.dp)
+            .padding(horizontal = 20.dp)
     ) {
-        item {
+        item(key = "header") {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -126,7 +148,7 @@ fun HomeScreen(){
             }
         }
 
-        item {
+        item (key = "money"){
             Spacer(Modifier.height(20.dp))
 
             Card(
@@ -150,10 +172,7 @@ fun HomeScreen(){
                     Box(
                         Modifier.matchParentSize()
                             .background(
-                                Brush.verticalGradient(
-                                    0f to Color.Black.copy(alpha = 0.1f),
-                                    1f to Color.Black.copy(alpha = 0.25f)
-                                )
+                               balanceGradient
                             )
                     )
 
@@ -221,7 +240,7 @@ fun HomeScreen(){
             }
         }
 
-        item {
+        item(key = "list_btn") {
 
             Spacer(Modifier.height(20.dp))
 
@@ -247,15 +266,15 @@ fun HomeScreen(){
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("My Analysis", style = MaterialTheme.typography.headlineSmall, color = Color(0xFF0F172A))
+                Text("My Analysis", style = MaterialTheme.typography.headlineSmall, color = Color(0xFF0F172A), fontWeight = FontWeight.Bold)
                 RangePill(range = range, onRangeChange = { range = it })
             }
         }
 
-        item {
+        item(key = "chart") {
             ChartCard(
-                bars = listOf(36f, 34f, 52f, 63f, 28f, 40f, 22f),
-                labels = listOf("Apr 30","May 01","May 02","May 03","May 04","May 05","May 06"),
+                bars = chartBars,
+                labels = chartLabels,
                 highlightIndex = 2,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
@@ -264,7 +283,7 @@ fun HomeScreen(){
             )
         }
 
-        item {
+        item(key = "title") {
             Spacer(Modifier.height(12.dp))
             Text(
                 "May, 2025",
@@ -274,18 +293,7 @@ fun HomeScreen(){
             )
         }
 
-        items(listOf(
-            Tx("Sent to Wilfred Alfred", "06 May 2022", -50.60),
-            Tx("Groceries - Walmart",   "05 May 2022", -32.45),
-            Tx("Deposit into spare",    "05 May 2022", 150.00),
-            Tx("Uber Ride",             "04 May 2022", -7.25),
-            Tx("App Store Refund",      "04 May 2022",  3.99),
-            Tx("Salary",                "03 May 2022", 2350.00),
-            Tx("Coffee Shop",           "03 May 2022", -4.80),
-            Tx("Electricity Bill",      "02 May 2022", -45.10),
-            Tx("Restaurant - Bento",    "01 May 2022", -12.30),
-            Tx("ATM Withdrawal",        "30 Apr 2022", -120.00)
-        )) { tx ->
+        items(transactions, key = { tx -> "${tx.tile}_${tx.date}" }) { tx ->
             TransactionRow(
                 tx = tx,
                 modifier = Modifier
@@ -385,14 +393,16 @@ private fun BarsChart(
     barWidth: Dp = 16.dp,
     girdLines: Int = 4
 ){
-    val max = (values.maxOrNull() ?: 0f).coerceAtLeast(1f)
-    val dash = PathEffect.dashPathEffect(floatArrayOf(10f, 14f), 0f)
+    val max = remember(values) { (values.maxOrNull() ?: 0f).coerceAtLeast(1f) }
+    val dash = remember { PathEffect.dashPathEffect(floatArrayOf(10f, 14f), 0f) }
 
     Canvas(modifier = modifier.fillMaxSize()) {
         val w = size.width
         val h = size.height
         val bw = barWidth.toPx()
-        val gap = (w - (values.size * bw)) / (values.size + 1)
+
+        // ✅ Chia đều width cho mỗi bar (giống SpaceBetween)
+        val sectionWidth = w / values.size
 
         repeat(girdLines) { i ->
             val y = h * (1f - (i + 1) / (girdLines + 1f))
@@ -406,10 +416,14 @@ private fun BarsChart(
         }
 
         values.forEachIndexed { index, v ->
-            val left = gap * (index + 1) + bw + index
+            // ✅ Căn giữa bar trong section của nó
+            val sectionStart = index * sectionWidth
+            val left = sectionStart + (sectionWidth - bw) / 2f
+
             val barHeight = (v / max) * (h * 0.9f)
             val top = h - barHeight
             val color = if(index == highlightIndex) Color(0xFF63F0CB) else Color(0xFF407AFF)
+
             drawRoundRect(
                 color = color,
                 topLeft = androidx.compose.ui.geometry.Offset(left, top),
@@ -419,7 +433,6 @@ private fun BarsChart(
         }
     }
 }
-
 data class Tx(
     val  tile: String,
     val  date: String,
@@ -428,20 +441,25 @@ data class Tx(
 
 @Composable
 private fun TransactionRow(tx : Tx, modifier: Modifier = Modifier){
-    val amountColor = if(tx.amount >= 0) Color(0xFF10B981) else Color(0xFFEF4444)
+    val amountColor = remember(tx.amount) { // ✅ Cache
+        if(tx.amount >= 0) Color(0xFF10B981) else Color(0xFFEF4444)
+    }
+    val dotColor = remember(tx.amount) { // ✅ Cache
+        if(tx.amount >= 0) Color(0xFF63F0CB) else Color(0xFF407AFF)
+    }
+
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
         color = Color.White,
         tonalElevation = 0.dp,
-        shadowElevation = 1.dp,
+        shadowElevation = 0.5.dp,
         onClick = {}
     ) {
         Row(
             Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val dotColor = if(tx.amount >= 0) Color(0xFF63F0CB) else Color(0xFF407AFF)
             Box(
                 Modifier.size(28.dp)
                     .clip(CircleShape)
@@ -465,6 +483,7 @@ private fun TransactionRow(tx : Tx, modifier: Modifier = Modifier){
                     color = Color(0xFF94A3B8)
                 )
             }
+            Spacer(Modifier.width(12.dp))
             Text(
                 text = (if (tx.amount >= 0) "+" else "") + formatMoney(tx.amount),
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),

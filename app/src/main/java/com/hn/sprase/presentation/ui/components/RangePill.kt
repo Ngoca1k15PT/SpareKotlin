@@ -1,4 +1,4 @@
-package com.hn.sprase.presentation.screen.home.components
+package com.hn.sprase.presentation.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.hn.sprase.domain.model.TimeRange
 
 @Composable
 fun RangePill(
