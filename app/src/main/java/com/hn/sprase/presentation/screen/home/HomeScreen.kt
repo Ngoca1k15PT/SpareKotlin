@@ -1,7 +1,5 @@
 package com.hn.sprase.presentation.screen.home
 
-import android.service.quicksettings.Tile
-import androidx.compose.animation.VectorConverter
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -24,12 +22,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.ArrowDropDown
@@ -38,7 +32,6 @@ import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -47,7 +40,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -68,9 +60,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColorInt
 import coil.compose.AsyncImage
 import com.hn.sprase.R
+import com.hn.sprase.presentation.screen.home.components.RangePill
+import com.hn.sprase.presentation.screen.home.components.TimeRange
 import java.text.NumberFormat
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -84,6 +77,9 @@ fun HomeScreen(){
     var visibleMoney by remember {
         mutableStateOf(false)
     }
+
+    var range by remember { mutableStateOf(TimeRange.Week) }
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize()
@@ -252,7 +248,7 @@ fun HomeScreen(){
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text("My Analysis", style = MaterialTheme.typography.headlineSmall, color = Color(0xFF0F172A))
-                WeekPill()
+                RangePill(range = range, onRangeChange = { range = it })
             }
         }
 
@@ -338,26 +334,6 @@ fun PillActionButton(
         Spacer(Modifier.width(5.dp))
         Text(text, color = textColor, fontWeight = FontWeight.Medium, fontSize = 10.sp)
 
-    }
-}
-
-@Composable
-private fun WeekPill(){
-    Surface(
-        onClick = {},
-        shape = RoundedCornerShape(50),
-        color = Color(0xFFE9EFFF),
-        contentColor = Color(0xFF407AFF),
-        shadowElevation = 0.dp,
-        tonalElevation = 0.dp,
-    ){
-        Row (
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Text("Week", style = MaterialTheme.typography.labelLarge, color = Color(0xFF407AFF))
-            Icon(Icons.Default.KeyboardArrowDown, contentDescription = null)
-        }
     }
 }
 
@@ -488,15 +464,12 @@ private fun TransactionRow(tx : Tx, modifier: Modifier = Modifier){
                     style = MaterialTheme.typography.labelSmall,
                     color = Color(0xFF94A3B8)
                 )
-                Spacer(Modifier.width(12.dp))
-                Text(
-                    text = (if (tx.amount >= 0) "+" else "") + formatMoney(tx.amount),
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
-                    color = amountColor
-                )
-                Spacer(Modifier.width(6.dp))
-                Icon(Icons.Default.KeyboardArrowRight, contentDescription = null, tint = Color(0xFFCBD5E1))
             }
+            Text(
+                text = (if (tx.amount >= 0) "+" else "") + formatMoney(tx.amount),
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+                color = amountColor
+            )
         }
     }
 
